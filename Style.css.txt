@@ -1,0 +1,108 @@
+Perfect! I'll give you the code file by file. Let's start with the most important one.
+📄 File 1: index.html
+Tap "Create new file" in GitHub, name it index.html, then paste this:
+    <main class="video-container">
+        <div class="video-wrapper local">
+            <div class="video-label">You (FaceSwap Active)</div>
+            <video id="localVideo" autoplay playsinline muted></video>
+            <canvas id="faceSwapCanvas" class="output-canvas"></canvas>
+        </div>
+
+        <div class="video-wrapper remote" id="remoteWrapper" style="display: none;">
+            <div class="video-label">Remote User</div>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+
+        <div class="waiting-state" id="waitingState">
+            <div class="waiting-content">
+                <div class="pulse-ring"></div>
+                <p>Waiting for someone to join...</p>
+                <div class="room-code">
+                    <span>Room ID: <strong id="roomId">Generating...</strong></span>
+                    <button onclick="copyRoomId()" class="icon-btn">📋</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside class="controls-panel">
+        <div class="control-section">
+            <h3>🎭 Choose Face</h3>
+            <div class="face-grid">
+                <div class="face-option active" data-face="none" onclick="selectFace('none')">
+                    <div class="face-thumb">😊</div>
+                    <span>Original</span>
+                </div>
+                <div class="face-option" data-face="celebrity1" onclick="selectFace('celebrity1')">
+                    <div class="face-thumb">🌟</div>
+                    <span>Celebrity 1</span>
+                </div>
+                <div class="face-option" data-face="celebrity2" onclick="selectFace('celebrity2')">
+                    <div class="face-thumb">🎬</div>
+                    <span>Celebrity 2</span>
+                </div>
+                <div class="face-option" data-face="custom" onclick="uploadCustomFace()">
+                    <div class="face-thumb">➕</div>
+                    <span>Upload</span>
+                </div>
+            </div>
+            <input type="file" id="faceUpload" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="control-section">
+            <h3>✨ Effects</h3>
+            <div class="effect-toggles">
+                <label class="toggle">
+                    <input type="checkbox" id="smoothSkin" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Smooth Skin</span>
+                </label>
+                <label class="toggle">
+                    <input type="checkbox" id="beautyFilter">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Beauty Filter</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="control-section call-controls">
+            <button id="startCall" class="btn btn-primary" onclick="startCall()">
+                <span>📞</span> Start Call
+            </button>
+            <button id="joinCall" class="btn btn-secondary" onclick="joinCall()">
+                <span>🔌</span> Join Call
+            </button>
+            <button id="endCall" class="btn btn-danger" onclick="endCall()" style="display: none;">
+                <span>📵</span> End Call
+            </button>
+        </div>
+
+        <div class="control-section debug">
+            <h3>📊 Stats</h3>
+            <div class="stats">
+                <div class="stat"><span>FPS:</span><span id="fps">0</span></div>
+                <div class="stat"><span>Faces:</span><span id="faceCount">0</span></div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="bottom-bar">
+        <button class="control-btn" id="muteBtn" onclick="toggleMute()">
+            <span class="icon">🎤</span>
+            <span class="label">Mute</span>
+        </button>
+        <button class="control-btn" id="videoBtn" onclick="toggleVideo()">
+            <span class="icon">📹</span>
+            <span class="label">Video</span>
+        </button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+
+After pasting:
+1.  Scroll down
+2.  Write commit message: Add main HTML file
+3.  Tap "Commit new file"
+----
+Ready for the next file (style.css)? Tell me when you've committed this one! 📄
