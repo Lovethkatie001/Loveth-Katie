@@ -1,0 +1,138 @@
+Great! Now let's create server.js (the backend signaling server).
+📄 File 4: server.js
+Create new file → Name: server.js → Paste this:
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const cors = require('cors');
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+cors: {
+origin: "*",
+methods: ["GET", "POST"]
+}
+});
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
+const rooms = new Map();
+const socketToRoom = new Map();
+io.on('connection', (socket) => {
+console.log('User connected:', socket.id);
+socket.on('join-room', (data) => {
+    const { roomId, userName } = data;
+    
+    socket.join(roomId);
+    socketToRoom.set(socket.id, roomId);
+    
+    if (!rooms.has(roomId)) {
+        rooms.set(roomId, new Set());
+    }
+    
+    rooms.get(roomId).add({
+        id: socket.id,
+        name: userName || 'Anonymous'
+    });
+    
+    const otherUsers = Array.from(rooms.get(roomId))
+        .filter(user => user.id !== socket.id);
+    
+    socket.emit('room-users', otherUsers);
+    socket.to(roomId).emit('user-joined', {
+        id: socket.id,
+        name: userName || 'Anonymous'
+    });
+    
+    console.log(`User ${socket.id} joined room ${roomId}`);
+});
+
+socket.on('offer', (data) => {
+    const { target, offer } = data;
+    io.to(target).emit('offer', {
+        from: socket.id,
+        offer: offer
+    });
+    console.log(`Offer from ${socket.id} to ${target}`);
+});
+
+socket.on('answer', (data) => {
+    const { target, answer } = data;
+    io.to(target).emit('answer', {
+        from: socket.id,
+        answer: answer
+    });
+    console.log(`Answer from ${socket.id} to ${target}`);
+});
+
+socket.on('ice-candidate', (data) => {
+    const { target, candidate } = data;
+    io.to(target).emit('ice-candidate', {
+        from: socket.id,
+        candidate: candidate
+    });
+});
+
+socket.on('chat-message', (data) => {
+    const roomId = socketToRoom.get(socket.id);
+    if (roomId) {
+        io.to(roomId).emit('chat-message', {
+            from: socket.id,
+            message: data.message,
+            timestamp: Date.now()
+        });
+    }
+});
+
+socket.on('disconnect', () => {
+    const roomId = socketToRoom.get(socket.id);
+    
+    if (roomId && rooms.has(roomId)) {
+        const room = rooms.get(roomId);
+        const userToRemove = Array.from(room).find(u => u.id === socket.id);
+        room.delete(userToRemove);
+        
+        if (room.size === 0) {
+            rooms.delete(roomId);
+        }
+        
+        socket.to(roomId).emit('user-left', socket.id);
+    }
+    
+    socketToRoom.delete(socket.id);
+    console.log('User disconnected:', socket.id);
+});
+
+});
+app.get('/api/status', (req, res) => {
+res.json({
+status: 'running',
+activeRooms: rooms.size,
+totalConnections: socketToRoom.size,
+uptime: process.uptime()
+});
+});
+app.get('/api/room/:roomId', (req, res) => {
+const roomId = req.params.roomId;
+if (rooms.has(roomId)) {
+res.json({
+roomId: roomId,
+users: Array.from(rooms.get(roomId))
+});
+} else {
+res.status(404).json({ error: 'Room not found' });
+}
+});
+app.get('/health', (req, res) => {
+res.json({ status: 'healthy' });
+});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+console.log(🚀 Signaling server running on port ${PORT});
+console.log(📡 WebSocket endpoint: ws://localhost:${PORT});
+console.log(🌐 HTTP endpoint: http://localhost:${PORT});
+});
+module.exports = { app, server, io };
+----
+Commit message: Add server.js ✅
+Next: package.json 📄
